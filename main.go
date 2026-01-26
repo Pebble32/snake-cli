@@ -1,8 +1,8 @@
 package main
 
 import (
-	"os"
 	"snake/terminal"
+	"snake/inputreader"
 )
 
 func main(){
@@ -13,11 +13,12 @@ func main(){
 
 	defer t.Restore()
 
-	buffer := make([]byte, 1)
-	for {
-		os.Stdin.Read(buffer)
+	ir := inputreader.New()
 
-		if buffer[0] == 'q' {
+	for {
+		key := ir.Read()
+
+		if key == 'q' {
 			break
 		}
 	}

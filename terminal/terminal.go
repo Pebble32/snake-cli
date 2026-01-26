@@ -61,11 +61,12 @@ func (t* Terminal) GetWindowSize() error {
 	return nil
 }
 
-func (t* Terminal) enableRawMode() {
+func (t* Terminal) enableRawMode() error{
     t.modified.Lflag &^= syscall.ECHO | syscall.ICANON | syscall.ISIG | syscall.IEXTEN
     t.modified.Iflag &^= syscall.BRKINT | syscall.ICRNL | syscall.INPCK | syscall.ISTRIP | syscall.IXON
     t.modified.Cflag |= syscall.CS8
     t.modified.Oflag &^= syscall.OPOST
     t.modified.Cc[syscall.VMIN+1] = 0
     t.modified.Cc[syscall.VTIME+1] = 1
+	return setTermios(t.fd, t.modified)
 } 

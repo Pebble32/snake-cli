@@ -3,7 +3,6 @@ package terminal
 import (
 	"syscall"
 	"unsafe"
-	"os"
 )
 
 type Termios struct {
