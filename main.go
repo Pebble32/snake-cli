@@ -1,9 +1,18 @@
 package main
 
 import (
-	"snake/terminal"
+	"snake/game"
 	"snake/inputreader"
+	"snake/render"
+	"snake/terminal"
+	"time"
 )
+
+func atExit(t* terminal.Terminal, r* render.Renderer, ticker* time.Ticker) {
+	t.Restore()
+	r.Restore()
+	ticker.Stop()
+}
 
 func main(){
 	t, err := terminal.New()
@@ -11,15 +20,32 @@ func main(){
 		panic(err)
 	}
 
-	defer t.Restore()
+
+
 
 	ir := inputreader.New()
 
-	for {
-		key := ir.Read()
+	g := game.New(t.NRows, t.NCols)
 
-		if key == 'q' {
-			break
+	r := render.New()
+
+	tickRate := time.Second / 10
+	ticker := time.NewTicker(tickRate)
+	events := make(chan byte)
+	go ir.Read(events)
+	var input byte
+
+	defer atExit(t, r, ticker)
+	for {
+		select {
+		case <- ticker.C:
+			r.Render(g)
+			g.Update(input)
+		case input = <-events:
+			if input == 'q' {
+				return
+			}
+
 		}
 	}
 }
