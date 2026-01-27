@@ -49,3 +49,21 @@ func (g* Game) spawnFood() {
 		}
 	}
 }
+
+func (g* Game) GameOver() bool{
+	head := g.Snake.Body[len(g.Snake.Body) - 1]
+	if head.X < 0 || head.X > g.NCols || head.Y < 0 || head.Y > g.NRows {
+		return true
+	}
+
+	for i, p := range g.Snake.Body {
+		if i == len(g.Snake.Body)-1 {
+			continue
+		}
+		if p == head {
+			return true
+		}
+	}
+
+	return false
+}

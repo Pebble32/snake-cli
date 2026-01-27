@@ -41,6 +41,9 @@ func main(){
 		case <- ticker.C:
 			r.Render(g)
 			g.Update(input)
+			if g.GameOver() {
+				return
+			}
 		case input = <-events:
 			if input == 'q' {
 				return
