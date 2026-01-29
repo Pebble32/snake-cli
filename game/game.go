@@ -20,13 +20,21 @@ func New(nRows, nCols int) *Game{
 func (g* Game) Update(key byte) {
 	switch key{
 	case 'w':
-		g.Snake.Dir = Up
+		if g.Snake.Dir != Down {
+			g.Snake.Dir = Up
+		}
 	case 's':
-		g.Snake.Dir = Down
+		if g.Snake.Dir != Up {
+			g.Snake.Dir = Down
+		}
 	case 'a':
-		g.Snake.Dir = Left
+		if g.Snake.Dir != Right {
+			g.Snake.Dir = Left
+		}
 	case 'd':
-		g.Snake.Dir = Right
+		if g.Snake.Dir != Left {
+			g.Snake.Dir = Right
+		}
 	}
 	g.Snake.Move()
 	head := g.Snake.Body[len(g.Snake.Body) - 1]

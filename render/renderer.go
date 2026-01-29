@@ -55,6 +55,21 @@ func (r* Renderer) RenderHighScore() {
 	
 }
 
+func (r *Renderer) RenderInputNameScreen(name string) {
+	var strOut strings.Builder; strOut.WriteString(clearScreen + cursorHide)
+	y := 10 
+    x := 20 
+
+    fmt.Fprintf(&strOut, "\x1b[%d;%dH+-----------------------------+", y, x)
+    fmt.Fprintf(&strOut, "\x1b[%d;%dH| Please input your name:     |", y+1, x)
+	// Here we reserve 24 spaces and align them left 
+    fmt.Fprintf(&strOut, "\x1b[%d;%dH| > %-24s  |", y+2, x, name+"_") 
+    
+    fmt.Fprintf(&strOut, "\x1b[%d;%dH+-----------------------------+", y+3, x)
+
+    os.Stdout.WriteString(strOut.String())
+}
+
 func (r* Renderer) Restore() {
 	outString := cursorHide
 	outString += clearScreen
