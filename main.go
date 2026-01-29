@@ -6,6 +6,7 @@ import (
 	"snake/render"
 	"snake/terminal"
 	"time"
+	"fmt"
 )
 
 func atExit(t* terminal.Terminal, r* render.Renderer, ticker* time.Ticker) {
@@ -20,12 +21,11 @@ func main(){
 		panic(err)
 	}
 
-
-
-
 	ir := inputreader.New()
 
 	g := game.New(t.NRows, t.NCols)
+
+	m := game.NewMenu()
 
 	r := render.New()
 
@@ -36,19 +36,34 @@ func main(){
 	var input byte
 
 	defer atExit(t, r, ticker)
-	for {
-		select {
-		case <- ticker.C:
-			r.Render(g)
-			g.Update(input)
-			if g.GameOver() {
-				return
-			}
-		case input = <-events:
-			if input == 'q' {
-				return
-			}
 
+	r.RenderMenu(m, t.NRows, t.NCols)
+	for {
+		input = <- events	
+		result := m.Update(input)
+		r.RenderMenu(m, t.NRows, t.NCols)
+
+		switch result {
+		case game.StartGame:
+			for {
+				select {
+				case <- ticker.C:
+					r.Render(g)
+					g.Update(input)
+					if g.GameOver() {
+						return
+					}
+				case input = <-events:
+					if input == 'q' {
+						return
+					}
+				}
+			}
+		case game.HighScore:
+			fmt.Println("This is high score")
+		case game.Exit:
+			return
 		}
+
 	}
 }

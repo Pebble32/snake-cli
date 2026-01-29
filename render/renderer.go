@@ -1,6 +1,7 @@
 package render
 
 import (
+	"strings"
 	"fmt"
 	"os"
 	"snake/game"
@@ -20,17 +21,34 @@ func New() *Renderer{
 }
 
 func (r* Renderer) Render(g* game.Game) {
-	strOut := clearScreen + cursorHide 
+	var strOut strings.Builder; strOut.WriteString(clearScreen + cursorHide) 
 	for i, p := range g.Snake.Body {
 		if len(g.Snake.Body) -1 == i {
-            strOut += fmt.Sprintf("\x1b[%d;%dHO", p.Y+1, p.X+1)
+            fmt.Fprintf(&strOut, "\x1b[%d;%dHO", p.Y+1, p.X+1)
 			break
 		}
-        strOut += fmt.Sprintf("\x1b[%d;%dH@", p.Y+1, p.X+1)
+        fmt.Fprintf(&strOut, "\x1b[%d;%dH@", p.Y+1, p.X+1)
 	}
 
-    strOut += fmt.Sprintf("\x1b[%d;%dH*", g.Food.Y+1, g.Food.X+1)
-	os.Stdout.WriteString(strOut)
+    fmt.Fprintf(&strOut, "\x1b[%d;%dH*", g.Food.Y+1, g.Food.X+1)
+	os.Stdout.WriteString(strOut.String())
+}
+
+func (r* Renderer) RenderMenu(m* game.Menu, NCols, NRows int) {
+	var strOut strings.Builder; strOut.WriteString(clearScreen + cursorHide)
+	for i, p := range m.Options {
+		x := int(NCols / 2) + i - 3
+		y := int(NRows / 2) - 3
+		label := p
+		if i == m.SelectedIndex {
+			label = "> " + p + "\n"
+		} else {
+			label = "  " + p + "\n"
+		}
+		// We add this specific line to the string in this specific position
+		fmt.Fprintf(&strOut, "\x1b[%d;%dH%s", x, y, label)
+	}
+	os.Stdout.WriteString(strOut.String())
 }
 
 func (r* Renderer) Restore() {
