@@ -51,6 +51,10 @@ func (r* Renderer) RenderMenu(m* game.Menu, NCols, NRows int) {
 	os.Stdout.WriteString(strOut.String())
 }
 
+func (r* Renderer) RenderHighScore() {
+	
+}
+
 func (r* Renderer) Restore() {
 	outString := cursorHide
 	outString += clearScreen

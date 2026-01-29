@@ -60,7 +60,7 @@ func main(){
 				}
 			}
 		case game.HighScore:
-			fmt.Println("This is high score")
+			r.RenderHighScore()
 		case game.Exit:
 			return
 		}
