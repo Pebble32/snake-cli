@@ -81,7 +81,7 @@ func main(){
 				}
 			}
 		case game.HighScore:
-			r.RenderHighScore()
+			r.RenderHighScore(sc)
 		case game.Exit:
 			return
 		}

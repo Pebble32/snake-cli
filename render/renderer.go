@@ -51,8 +51,15 @@ func (r* Renderer) RenderMenu(m* game.Menu, NCols, NRows int) {
 	os.Stdout.WriteString(strOut.String())
 }
 
-func (r* Renderer) RenderHighScore() {
-	
+func (r* Renderer) RenderHighScore(sc *game.Score) {
+	allScores := sc.LoadScore()
+	var strOut strings.Builder; strOut.WriteString(clearScreen + cursorHide)
+	for i, p := range(allScores) {
+		y := 10 
+		x := 20 
+		fmt.Fprintf(&strOut, "\x1b[%d;%dH%s;%d;%s", y+i, x, p.Name, p.Score, p.Date.Format("2006-01-13"))
+	}
+	os.Stdout.WriteString(strOut.String())
 }
 
 func (r *Renderer) RenderInputNameScreen(name string) {
