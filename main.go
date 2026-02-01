@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"snake/game"
 	"snake/inputreader"
 	"snake/render"
@@ -67,8 +68,16 @@ func main(){
 			for {
 				select {
 				case <- ticker.C:
+					score1 := len(g.Snake.Body)
 					r.RenderSnake(g)
 					g.Update(input)
+					score2 := len(g.Snake.Body)
+					if score2 > score1 && score2 < 11 {
+						ticker.Stop()
+						multiplier := 1.0 + (math.Log10(float64(score2) + 1.0))
+						tickRate = tickRate / time.Duration(multiplier)
+						ticker = time.NewTicker(tickRate)
+					}
 					if g.GameOver() {
 						name := getUserName(events, r, len(g.Snake.Body), t.NCols, t.NRows)
 						sc.SaveScore(name, len(g.Snake.Body))

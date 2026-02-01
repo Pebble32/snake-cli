@@ -137,18 +137,27 @@ func (r *Renderer) RenderInputNameScreen(name string, currentScore, NCols, NRows
 	var strOut strings.Builder
 	strOut.WriteString(clearScreen + cursorHide)
 
-	boxWidth := 33
-	boxHeight := 6
+	boxWidth := 34
 	x := (NCols / 2) - (boxWidth / 2)
-	y := (NRows / 2) - (boxHeight / 2)
+	y := (NRows / 2) - 3
 
-	fmt.Fprintf(&strOut, "\x1b[%d;%dH+--------------------------------+", y, x)
-	fmt.Fprintf(&strOut, "\x1b[%d;%dH|        GAME OVER!              |", y+1, x)
-	fmt.Fprintf(&strOut, "\x1b[%d;%dH|    YOUR SCORE WAS: %-5d       |", y+2, x, currentScore)
-	fmt.Fprintf(&strOut, "\x1b[%d;%dH+--------------------------------+", y+3, x)
-	fmt.Fprintf(&strOut, "\x1b[%d;%dH| Please input your name:        |", y+4, x)
-	fmt.Fprintf(&strOut, "\x1b[%d;%dH| > %-26s |", y+5, x, name+"_")
-	fmt.Fprintf(&strOut, "\x1b[%d;%dH+--------------------------------+", y+6, x)
+	draw := func(rowOffset int, content string) {
+		fmt.Fprintf(&strOut, "\x1b[%d;%dH%s", y+rowOffset, x, content)
+	}
+
+	draw(0, "+--------------------------------+")
+	draw(1, "|           GAME OVER!           |")
+	
+	draw(2, fmt.Sprintf("|    YOUR SCORE WAS: %-5d       |", currentScore))
+	
+	draw(3, "+--------------------------------+")
+	draw(4, "| Please input your name:        |")
+	
+	inputLine := fmt.Sprintf("> %s", name+"_")
+	draw(5, fmt.Sprintf("| %-30s |", inputLine))
+	
+	draw(6, "+--------------------------------+")
+
 	os.Stdout.WriteString(strOut.String())
 }
 
