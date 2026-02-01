@@ -67,7 +67,7 @@ func main(){
 			for {
 				select {
 				case <- ticker.C:
-					r.Render(g)
+					r.RenderSnake(g)
 					g.Update(input)
 					if g.GameOver() {
 						name := getUserName(events, r, len(g.Snake.Body), t.NCols, t.NRows)

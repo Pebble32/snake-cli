@@ -20,7 +20,7 @@ func New() *Renderer{
 	return &Renderer{}
 }
 
-func (r* Renderer) Render(g* game.Game) {
+func (r* Renderer) RenderSnake(g* game.Game) {
 	var strOut strings.Builder; strOut.WriteString(clearScreen + cursorHide) 
 	for i, p := range g.Snake.Body {
 		if len(g.Snake.Body) -1 == i {
@@ -56,41 +56,72 @@ func (r *Renderer) RenderHighScore(sc *game.Score, NCols, NRows int) {
 	var strOut strings.Builder
 	strOut.WriteString(clearScreen + cursorHide)
 
-	// 1. Define Box Width and find Center
-	boxWidth := 40
+	const (
+		boxWidth   = 46
+		innerWidth = boxWidth - 2 
+		nameWidth  = 20
+	)
+
 	startX := (NCols / 2) - (boxWidth / 2)
-	startY := (NRows / 2) - 5 // Offset upward so the list starts near the middle
+	startY := (NRows / 2) - 6
 
-	// 2. Draw Header
-	fmt.Fprintf(&strOut, "\x1b[%d;%dH+--------------------------------------------+", startY, startX)
-	fmt.Fprintf(&strOut, "\x1b[%d;%dH|          SNAKE HIGH SCORES           |", startY+1, startX)
-	fmt.Fprintf(&strOut, "\x1b[%d;%dH+--------------------------------------------+", startY+2, startX)
+	lineBorder := "+--------------------------------------------+"
 
-	// 3. Draw Scores (Limit to Top 10)
-	for i, p := range allScores {
-		if i >= 10 { break } // Don't overflow the screen
-		
-		// Create a formatted string for the player info
-		// %-3d = Rank (3 spaces)
-		// %-12s = Name (12 spaces, left aligned)
-		// %6d = Score (6 spaces, right aligned)
-		scoreLine := fmt.Sprintf("%2d. %-12s %6d pts  %s", 
-			i+1, p.Name, p.Score, p.Date.Format("2006-01-02"))
+	fmt.Fprintf(&strOut, "\x1b[%d;%dH%s", startY, startX, lineBorder)
 
-		fmt.Fprintf(&strOut, "\x1b[%d;%dH| %-36s |", startY+3+i, startX, scoreLine)
-	}
+	title := "SNAKE HIGH SCORES"
+	leftPad := (innerWidth - len(title)) / 2
+	rightPad := innerWidth - len(title) - leftPad
+	fmt.Fprintf(
+		&strOut,
+		"\x1b[%d;%dH|%s%s%s|",
+		startY+1,
+		startX,
+		strings.Repeat(" ", leftPad),
+		title,
+		strings.Repeat(" ", rightPad),
+	)
 
-	// 4. Fill empty lines if there are fewer than 5 scores
-	if len(allScores) < 5 {
-		for i := len(allScores); i < 5; i++ {
-			fmt.Fprintf(&strOut, "\x1b[%d;%dH|                                      |", startY+3+i, startX)
+	fmt.Fprintf(&strOut, "\x1b[%d;%dH%s", startY+2, startX, lineBorder)
+
+	// Score top 10 for now
+	for i := range 10 {
+		currentY := startY + 3 + i
+
+		var line string
+		if i < len(allScores) {
+			p := allScores[i]
+
+			displayName := p.Name
+			if len(displayName) > nameWidth {
+				displayName = displayName[:nameWidth-3] + "..."
+			}
+
+			// 43 chars total -> last char padded to 44 for breathing space
+			line = fmt.Sprintf(
+				"%2d. %-20s %5dpts %s",
+				i+1,
+				displayName,
+				p.Score,
+				p.Date.Format("2006-01-02"),
+			)
 		}
+
+		if len(line) > innerWidth {
+			line = line[:innerWidth]
+		} else {
+			line += strings.Repeat(" ", innerWidth-len(line))
+		}
+
+		fmt.Fprintf(&strOut, "\x1b[%d;%dH|%s|", currentY, startX, line)
 	}
 
-	// 5. Draw Footer
-	lastLine := startY + 3 + max(len(allScores), 5)
-	fmt.Fprintf(&strOut, "\x1b[%d;%dH+--------------------------------------------+", lastLine, startX)
-	fmt.Fprintf(&strOut, "\x1b[%d;%dH  Press any key to return to menu...", lastLine+2, startX+2)
+	lastLine := startY + 13
+	fmt.Fprintf(&strOut, "\x1b[%d;%dH%s", lastLine, startX, lineBorder)
+
+	instruction := "Press any key to return to menu..."
+	instrX := (NCols / 2) - (len(instruction) / 2)
+	fmt.Fprintf(&strOut, "\x1b[%d;%dH%s", lastLine+2, instrX, instruction)
 
 	os.Stdout.WriteString(strOut.String())
 }
