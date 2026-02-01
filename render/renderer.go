@@ -34,20 +34,36 @@ func (r* Renderer) RenderSnake(g* game.Game) {
 	os.Stdout.WriteString(strOut.String())
 }
 
-func (r* Renderer) RenderMenu(m* game.Menu, NCols, NRows int) {
-	var strOut strings.Builder; strOut.WriteString(clearScreen + cursorHide)
-	for i, p := range m.Options {
-		x := int(NCols / 2) + i - 3
-		y := int(NRows / 2) - 3
-		label := p
-		if i == m.SelectedIndex {
-			label = "> " + p + "\n"
-		} else {
-			label = "  " + p + "\n"
-		}
-		// We add this specific line to the string in this specific position
-		fmt.Fprintf(&strOut, "\x1b[%d;%dH%s", x, y, label)
+func (r *Renderer) RenderMenu(m *game.Menu, NCols, NRows int) {
+	var strOut strings.Builder
+	strOut.WriteString(clearScreen + cursorHide)
+
+	logo := []string{
+		`  _________ _______      _____   ____  __.___________`,
+		` /   _____/ \      \    /  _  \ |    |/ _|\_   _____/`,
+		` \_____  \  /   |   \  /  /_\  \|    |  <  |    __)_ `,
+		` /        \/    |    \/    |    \    |  \  |        \`,
+		`/_______  /\____|__  /\____|__  /____|__ \/_______  /`,
+		`        \/         \/         \/        \/        \/`,
 	}
+
+	logoStartY := 2 
+	for i, line := range logo {
+		x := int(NCols/2) + 10		// columns
+		y := logoStartY + i		// rows
+		fmt.Fprintf(&strOut, "\x1b[%d;%dH%s", y, x, line)
+	}
+
+	for i, p := range m.Options {
+		y := int(NCols/2) + i - 3
+		x := int(NRows/2) - 3
+		label := "  " + p
+		if i == m.SelectedIndex {
+			label = "> " + p
+		}
+		fmt.Fprintf(&strOut, "\x1b[%d;%dH%s", y, x, label)
+	}
+
 	os.Stdout.WriteString(strOut.String())
 }
 
