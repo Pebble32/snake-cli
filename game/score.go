@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
 	"time"
 )
 
@@ -23,7 +24,7 @@ func (sc *Score) SaveScore(name string, score int) {
 		fmt.Println("Error while creating directory", err)
 		return
 	}
-	allScores := sc.LoadScore()
+	allScores := sc.LoadSortedScores()
 
 	newScore := Score{
 		Name: name,
@@ -45,7 +46,7 @@ func (sc *Score) SaveScore(name string, score int) {
 	}
 }
 
-func (sc *Score) LoadScore() []Score{
+func (sc *Score) LoadSortedScores() []Score{
 	data, err := os.ReadFile("highscore/highscore.json")
 	if err != nil {
 		return []Score{}
@@ -57,5 +58,8 @@ func (sc *Score) LoadScore() []Score{
 		fmt.Println("Error while unmarshiling the data", err)
 		return []Score{}
 	}
+	sort.Slice(allScores, func(i, j int) bool {
+		return allScores[i].Score > allScores[j].Score
+	})
 	return allScores
 }

@@ -14,9 +14,9 @@ func atExit(t* terminal.Terminal, r* render.Renderer, ticker* time.Ticker) {
 	ticker.Stop()
 }
 
-func getUserName(events chan byte, r *render.Renderer) string {
+func getUserName(events chan byte, r *render.Renderer, score, NCol, NRow int) string {
 	name := ""
-	r.RenderInputNameScreen(name)
+	r.RenderInputNameScreen(name, score, NCol, NRow)
 	for {
 		char := <- events
 
@@ -32,7 +32,7 @@ func getUserName(events chan byte, r *render.Renderer) string {
 				name += string(char)
 			}
 		}
-		r.RenderInputNameScreen(name)
+		r.RenderInputNameScreen(name, score, NCol, NRow)
 	}
 }
 
@@ -70,7 +70,7 @@ func main(){
 					r.Render(g)
 					g.Update(input)
 					if g.GameOver() {
-						name := getUserName(events, r)
+						name := getUserName(events, r, len(g.Snake.Body), t.NCols, t.NRows)
 						sc.SaveScore(name, len(g.Snake.Body))
 						return
 					}
@@ -81,7 +81,7 @@ func main(){
 				}
 			}
 		case game.HighScore:
-			r.RenderHighScore(sc)
+			r.RenderHighScore(sc, t.NCols, t.NRows)
 		case game.Exit:
 			return
 		}
